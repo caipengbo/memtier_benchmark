@@ -62,9 +62,11 @@ bool client::setup_client(benchmark_config *config, abstract_protocol *protocol,
     shard_connection* conn = new shard_connection(m_connections.size(), this, m_config, m_event_base, protocol);
     m_connections.push_back(conn);
 
+    // clone 一个 objgen 对象，该对象是用来创建 value 的
     m_obj_gen = objgen->clone();
     assert(m_obj_gen != NULL);
 
+    // 配置随机化参数
     if (config->distinct_client_seed && config->randomize)
         m_obj_gen->set_random_seed(config->randomize + config->next_client_idx);
     else if (config->randomize)
@@ -75,6 +77,7 @@ bool client::setup_client(benchmark_config *config, abstract_protocol *protocol,
     // Parallel key-pattern determined according to the first command
     if ((config->arbitrary_commands->is_defined() && config->arbitrary_commands->at(0).key_pattern == 'P') ||
         (config->key_pattern[key_pattern_set]=='P')) {
+        // 计算当前 client 的 key range
         unsigned long long client_index = config->next_client_idx % total_num_of_clients;
 
         unsigned long long range = (config->key_maximum - config->key_minimum)/total_num_of_clients + 1;
@@ -95,6 +98,7 @@ bool client::setup_client(benchmark_config *config, abstract_protocol *protocol,
     return true;
 }
 
+// 根据 client_group 信息创建新的 client
 client::client(client_group* group) :
         m_event_base(NULL), m_initialized(false), m_end_set(false), m_config(NULL),
         m_obj_gen(NULL), m_stats(group->get_config()), m_reqs_processed(0), m_reqs_generated(0),
@@ -261,7 +265,6 @@ void client::create_arbitrary_request(const arbitrary_command* cmd, struct timev
         } else if (arg->type == data_type) {
             unsigned int value_len;
             const char *value = m_obj_gen->get_value(0, &value_len);
-
             assert(value != NULL);
             assert(value_len > 0);
 

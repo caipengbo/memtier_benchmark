@@ -959,6 +959,7 @@ void usage() {
 
 static void* cg_thread_start(void *t);
 
+// 对线程进行封装，里面有一个clien_group
 struct cg_thread {
     unsigned int m_thread_id;
     benchmark_config* m_config;
@@ -1009,7 +1010,7 @@ struct cg_thread {
     }
 
 };
-
+// 线程的执行函数
 static void* cg_thread_start(void *t)
 {
     cg_thread* thread = (cg_thread*) t;
@@ -1039,6 +1040,8 @@ run_stats run_benchmark(int run_id, benchmark_config* cfg, object_generator* obj
 
     // prepare threads data
     std::vector<cg_thread*> threads;
+    //
+    // 根据配置的线程数，创建线程
     for (unsigned int i = 0; i < cfg->threads; i++) {
         cg_thread* t = new cg_thread(i, cfg, obj_gen);
         assert(t != NULL);
@@ -1052,6 +1055,7 @@ run_stats run_benchmark(int run_id, benchmark_config* cfg, object_generator* obj
 
     // launch threads
     fprintf(stderr, "[RUN #%u] Launching threads now...\n", run_id);
+    // 启动所有线程
     for (std::vector<cg_thread*>::iterator i = threads.begin(); i != threads.end(); i++) {
         (*i)->start();
     }
@@ -1228,13 +1232,15 @@ static void cleanup_openssl(void)
 
 int main(int argc, char *argv[])
 {
+    // 配置
     benchmark_config cfg = benchmark_config();
     cfg.arbitrary_commands = new arbitrary_command_list();
 
+    // 解析配置
     if (config_parse_args(argc, argv, &cfg) < 0) {
         usage();
     }
-
+    // 对于没有指定的配置，设置默认值
     config_init_defaults(&cfg);
     log_level = cfg.debug;
     if (cfg.show_config) {

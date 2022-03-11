@@ -95,7 +95,7 @@ protected:
     struct timeval m_end_time;
 
     totals m_totals;
-
+  // TODO(caipengbo) 此处会有很多很多元素，每个命令都会维护一个，最终会OOM(See#157)
     std::vector<one_second_stats> m_stats;
 
     // current second stats ( appended to m_stats and reset every second )

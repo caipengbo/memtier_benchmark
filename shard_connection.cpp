@@ -369,6 +369,7 @@ void shard_connection::send_conn_setup_commands(struct timeval timestamp) {
     }
 }
 
+// 处理响应
 void shard_connection::process_response(void)
 {
     int ret;
@@ -485,6 +486,8 @@ void shard_connection::fill_pipeline(void)
         if (m_conns_manager->hold_pipeline(m_id)) {
             break;
         }
+
+        // TODO(caipengbo) 限流
 
         // client manage requests logic
         m_conns_manager->create_request(now, m_id);

@@ -83,13 +83,6 @@ To build natively on macOS, use Homebrew to install the required dependencies:
 $ brew install autoconf automake libtool libevent pkg-config openssl@1.1
 ```
 
-When running `./configure`, if it fails to find libssl it may be necessary to
-tweak the `PKG_CONFIG_PATH` environment variable:
-
-```
-PKG_CONFIG_PATH=/usr/local/opt/openssl@1.1/lib/pkgconfig ./configure
-```
-
 ### Building and installing
 
 After downloading the source tree, use standard autoconf/automake commands:
@@ -97,6 +90,22 @@ After downloading the source tree, use standard autoconf/automake commands:
 ```
 $ autoreconf -ivf
 $ ./configure
+$ make
+$ make install
+```
+
+When running `./configure`, if it fails to find libssl it may be necessary to
+tweak the `PKG_CONFIG_PATH` environment variable:
+
+```
+PKG_CONFIG_PATH=/opt/homebrew/opt/openssl/lib/pkgconfig ./configure
+```
+
+So it will:
+
+```
+$ autoreconf -ivf
+$ PKG_CONFIG_PATH=/opt/homebrew/opt/openssl/lib/pkgconfig ./configure
 $ make
 $ make install
 ```
@@ -177,3 +186,6 @@ Sample Visual Feel of the full latency spectrum using an [online formatter](http
 
 
 [sample_visual_histogram]: ./docs/sample_visual_histogram.png "Sample Full Latency Spectrum Histogram"
+
+Example:
+./memtier_benchmark -p 6666 --command="set __key__ __data__" --requests=100 --random-data --data-size=1024
